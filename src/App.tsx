@@ -48,7 +48,7 @@ const Main: React.FC = () => {
 
   // 스왑 버튼 활성화/비활성화 여부를 체크하는 함수
   const checkSwapButtonState = () => {
-     // 모든 필드가 채워졌는지, 금액이 잔액을 초과하는지 등을 확인
+    // 모든 필드가 채워졌는지, 금액이 잔액을 초과하는지 등을 확인
     if (!fromCurrency || !toCurrency || amount <= 0) {
       setIsSwapDisabled(true); // 통화와 금액이 모두 입력되지 않으면 비활성화
     } else if (amount > (balances[fromCurrency] || 0)) {
@@ -61,13 +61,32 @@ const Main: React.FC = () => {
   // Swap 처리
   const handleSwap = async () => {
     if (!fromCurrency || !toCurrency || amount <= 0) return; // 필수 값들이 채워지지 않으면 반환
+
     try {
+      // "You pay" 금액에서 잔액 차감
+      const newBalanceFromCurrency = (Number(balances[fromCurrency]) || 0) - amount; 
+
+      // "You receive" 금액 계산 (가격 변환)
+      const receiveAmount = (amount * (Number(prices[fromCurrency]) || 0)) / (Number(prices[toCurrency]) || 1); 
+
+      // "You receive" 통화의 잔액 추가
+      const newBalanceToCurrency = (Number(balances[toCurrency]) || 0) + receiveAmount;
+
+      // 데이터 서버로 전송
       const swapData = { fromCurrency, toCurrency, amount };
       await postSwap(swapData); // API 호출 (POST 요청)
-      alert('Swap completed!');
+
+      // 상태 업데이트 (잔액 업데이트)
+      setBalances({
+        ...balances,
+        [fromCurrency]: newBalanceFromCurrency, // "You pay" 통화 잔액 차감
+        [toCurrency]: newBalanceToCurrency, // "You receive" 통화 잔액 추가
+      });
+
+      alert('Swap completed!'); // 성공 알림
     } catch (error) {
       alert('Swap failed!');
-      console.error('Swap failed:', error);
+      console.error('Swap failed:', error); // 에러 로그
     }
   };
 
@@ -75,6 +94,7 @@ const Main: React.FC = () => {
   const handleSwapCurrencies = () => {
     setFromCurrency(toCurrency); // "You pay"와 "You receive"의 값을 교환
     setToCurrency(fromCurrency);
+    checkSwapButtonState(); // 상태 변경 후 스왑 버튼 상태 확인
   };
 
   // 상태 변경 후 checkSwapButtonState 호출
