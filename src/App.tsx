@@ -4,7 +4,8 @@ import { getBalance, getPrice, postSwap } from './services/api'; // API 호출 함�
 import TokenSelector from './component/TokenSelector'; // TokenSelector 컴포넌트
 
 const Main: React.FC = () => {
-  const [isTokenSelectorOpen, setIsTokenSelectorOpen] = useState<'from' | 'to' | null>(null); // 모달 상태
+  // 상태 변수 선언
+  const [isTokenSelectorOpen, setIsTokenSelectorOpen] = useState<'from' | 'to' | null>(null); // 모달 상태 (from: "You pay", to: "You receive")
   const [fromCurrency, setFromCurrency] = useState<string>(''); // "You pay" 통화
   const [toCurrency, setToCurrency] = useState<string>(''); // "You receive" 통화
   const [amount, setAmount] = useState<number>(0); // 입력 금액
@@ -12,38 +13,42 @@ const Main: React.FC = () => {
   const [prices, setPrices] = useState<{ [key: string]: number }>({}); // 가격 (USD 값)
   const [isSwapDisabled, setIsSwapDisabled] = useState<boolean>(true); // Swap 버튼 비활성화 여부
 
+  // 초기 데이터 로드 (잔액과 가격) - 비동기 호출
   useEffect(() => {
-    // 초기 데이터 로드 (잔액과 가격)
     const fetchData = async () => {
       try {
         const balancesData = await getBalance(); // 잔액 API 호출
         const pricesData = await getPrice(); // 가격 API 호출
-        setBalances(balancesData);
-        setPrices(pricesData);
+        setBalances(balancesData); // 응답 받은 잔액 데이터 상태에 설정
+        setPrices(pricesData); // 응답 받은 가격 데이터 상태에 설정
       } catch (error) {
         console.error('Failed to fetch initial data:', error);
       }
     };
     fetchData();
-  }, []);
+  }, []); // 빈 배열을 넣어 초기 렌더링 시 한 번만 호출
 
   // 금액 변경 처리 이벤트
   const handleAmountChange = (value: number) => {
-    setAmount(value);
+    setAmount(value); // 입력 금액 상태 업데이트
+    checkSwapButtonState(); // 금액 변경 시 스왑 버튼 상태 체크
   };
 
   // "You pay" 통화 선택 처리 이벤트
   const handleFromCurrencyChange = (currency: string) => {
-    setFromCurrency(currency);
+    setFromCurrency(currency); // "You pay" 통화 상태 업데이트
+    checkSwapButtonState(); // 통화 변경 시 스왑 버튼 상태 체크
   };
 
   // "You receive" 통화 선택 처리 이벤트
   const handleToCurrencyChange = (currency: string) => {
-    setToCurrency(currency);
+    setToCurrency(currency); // "You receive" 통화 상태 업데이트
+    checkSwapButtonState(); // 통화 변경 시 스왑 버튼 상태 체크
   };
 
   // 스왑 버튼 활성화/비활성화 여부를 체크하는 함수
-  const checkSwapButtonState = () => {  
+  const checkSwapButtonState = () => {
+     // 모든 필드가 채워졌는지, 금액이 잔액을 초과하는지 등을 확인
     if (!fromCurrency || !toCurrency || amount <= 0) {
       setIsSwapDisabled(true); // 통화와 금액이 모두 입력되지 않으면 비활성화
     } else if (amount > (balances[fromCurrency] || 0)) {
@@ -55,10 +60,10 @@ const Main: React.FC = () => {
 
   // Swap 처리
   const handleSwap = async () => {
-    if (!fromCurrency || !toCurrency || amount <= 0) return;
+    if (!fromCurrency || !toCurrency || amount <= 0) return; // 필수 값들이 채워지지 않으면 반환
     try {
       const swapData = { fromCurrency, toCurrency, amount };
-      await postSwap(swapData);
+      await postSwap(swapData); // API 호출 (POST 요청)
       alert('Swap completed!');
     } catch (error) {
       alert('Swap failed!');
@@ -68,14 +73,14 @@ const Main: React.FC = () => {
 
   // "You pay"와 "You receive"의 통화를 교환하는 함수
   const handleSwapCurrencies = () => {
-    setFromCurrency(toCurrency);
+    setFromCurrency(toCurrency); // "You pay"와 "You receive"의 값을 교환
     setToCurrency(fromCurrency);
   };
 
   // 상태 변경 후 checkSwapButtonState 호출
   useEffect(() => {
-    checkSwapButtonState();
-  }, [fromCurrency, toCurrency, amount, balances]);
+    checkSwapButtonState(); // fromCurrency, toCurrency, amount, balances 상태가 변경될 때마다 호출
+  }, [fromCurrency, toCurrency, amount, balances]); // 의존성 배열에 필요한 상태 추가
 
   return (
     <>
@@ -97,7 +102,7 @@ const Main: React.FC = () => {
                     <input
                       type="number"
                       value={amount}
-                      onChange={(e) => handleAmountChange(Number(e.target.value))}
+                      onChange={(e) => handleAmountChange(Number(e.target.value))} // 금액 변경 시 처리
                       placeholder="Enter amount"
                     />
                   </div>
@@ -110,7 +115,7 @@ const Main: React.FC = () => {
                   <div className="lt"></div>
                   <div className="rt">
                     <div className="balance">
-                      <span>Balance: {balances[fromCurrency]}</span>
+                      <span>Balance: {balances[fromCurrency]}</span> {/* 현재 선택된 통화의 잔액 표시 */}
                     </div>
                   </div>
                 </div>
@@ -130,11 +135,9 @@ const Main: React.FC = () => {
                     <input
                       type="number"
                       placeholder="0"
-                      value={
-                        fromCurrency && toCurrency && amount > 0
-                          ? ((amount * prices[fromCurrency]) / prices[toCurrency]).toFixed(2)
-                          : ''
-                      }
+                      value={fromCurrency && toCurrency && amount > 0
+                        ? ((amount * prices[fromCurrency]) / prices[toCurrency]).toFixed(2) // 계산된 You receive 금액
+                        : ''}
                       readOnly
                     />
                   </div>
@@ -146,7 +149,7 @@ const Main: React.FC = () => {
                 <div className="item-flex amount">
                   <div className="rt">
                     <div className="balance">
-                      <span>Balance: {balances[toCurrency]}</span>
+                      <span>Balance: {balances[toCurrency]}</span> {/* 현재 선택된 "You receive" 통화의 잔액 표시 */}
                     </div>
                   </div>
                 </div>
