@@ -4,7 +4,7 @@ import { getBalance, getPrice, postSwap } from './services/api'; // API 호출 함�
 import TokenSelector from './component/TokenSelector'; // TokenSelector 컴포넌트
 
 const Main: React.FC = () => {
-  const [isTokenSelectorOpen, setIsTokenSelectorOpen] = useState<'from' | 'to' | null>(null);
+  const [isTokenSelectorOpen, setIsTokenSelectorOpen] = useState<'from' | 'to' | null>(null); // 모달 상태
   const [fromCurrency, setFromCurrency] = useState<string>(''); // "You pay" 통화
   const [toCurrency, setToCurrency] = useState<string>(''); // "You receive" 통화
   const [amount, setAmount] = useState<number>(0); // 입력 금액
@@ -13,7 +13,7 @@ const Main: React.FC = () => {
   const [isSwapDisabled, setIsSwapDisabled] = useState<boolean>(true); // Swap 버튼 비활성화 여부
 
   useEffect(() => {
-    // 초기 데이터 로드
+    // 초기 데이터 로드 (잔액과 가격)
     const fetchData = async () => {
       try {
         const balancesData = await getBalance(); // 잔액 API 호출
@@ -27,8 +27,23 @@ const Main: React.FC = () => {
     fetchData();
   }, []);
 
-  // 스왑 버튼 활성화 여부를 확인하는 함수
-  const checkSwapButtonState = () => {
+  // 금액 변경 처리 이벤트
+  const handleAmountChange = (value: number) => {
+    setAmount(value);
+  };
+
+  // "You pay" 통화 선택 처리 이벤트
+  const handleFromCurrencyChange = (currency: string) => {
+    setFromCurrency(currency);
+  };
+
+  // "You receive" 통화 선택 처리 이벤트
+  const handleToCurrencyChange = (currency: string) => {
+    setToCurrency(currency);
+  };
+
+  // 스왑 버튼 활성화/비활성화 여부를 체크하는 함수
+  const checkSwapButtonState = () => {  
     if (!fromCurrency || !toCurrency || amount <= 0) {
       setIsSwapDisabled(true); // 통화와 금액이 모두 입력되지 않으면 비활성화
     } else if (amount > (balances[fromCurrency] || 0)) {
@@ -36,19 +51,6 @@ const Main: React.FC = () => {
     } else {
       setIsSwapDisabled(false); // 조건을 충족하면 활성화
     }
-  };
-
-  // 금액 변경 처리
-  const handleAmountChange = (value: number) => {
-    setAmount(value);
-    checkSwapButtonState(); // 금액 변경 시 스왑 버튼 상태 확인
-  };
-
-  // "You pay"와 "You receive" 통화 선택 처리
-  const handleSwapCurrencies = () => {
-    setFromCurrency(toCurrency);
-    setToCurrency(fromCurrency);
-    checkSwapButtonState(); // 통화 변경 시 스왑 버튼 상태 확인
   };
 
   // Swap 처리
@@ -63,6 +65,17 @@ const Main: React.FC = () => {
       console.error('Swap failed:', error);
     }
   };
+
+  // "You pay"와 "You receive"의 통화를 교환하는 함수
+  const handleSwapCurrencies = () => {
+    setFromCurrency(toCurrency);
+    setToCurrency(fromCurrency);
+  };
+
+  // 상태 변경 후 checkSwapButtonState 호출
+  useEffect(() => {
+    checkSwapButtonState();
+  }, [fromCurrency, toCurrency, amount, balances]);
 
   return (
     <>
@@ -154,14 +167,13 @@ const Main: React.FC = () => {
         <TokenSelector
           onSelect={(token: string) => {
             if (isTokenSelectorOpen === 'from') {
-              setFromCurrency(token);
+              handleFromCurrencyChange(token); // "You pay" 통화 변경
             } else {
-              setToCurrency(token);
+              handleToCurrencyChange(token); // "You receive" 통화 변경
             }
-            checkSwapButtonState(); // 선택 후 스왑 버튼 상태 확인
             setIsTokenSelectorOpen(null); // 모달 닫기
           }}
-          onClose={() => setIsTokenSelectorOpen(null)}
+          onClose={() => setIsTokenSelectorOpen(null)} // 모달 닫기
         />
       )}
     </>
