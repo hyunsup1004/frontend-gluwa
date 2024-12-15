@@ -53,6 +53,8 @@ const Main: React.FC = () => {
       setIsSwapDisabled(true); // 통화와 금액이 모두 입력되지 않으면 비활성화
     } else if (amount > (balances[fromCurrency] || 0)) {
       setIsSwapDisabled(true); // 잔액 초과 시 비활성화
+    } else if (fromCurrency === toCurrency) {
+      setIsSwapDisabled(true); // 같은 통화일 경우 비활성화
     } else {
       setIsSwapDisabled(false); // 조건을 충족하면 활성화
     }
@@ -64,24 +66,33 @@ const Main: React.FC = () => {
 
     try {
       // "You pay" 금액에서 잔액 차감
-      const newBalanceFromCurrency = (Number(balances[fromCurrency]) || 0) - amount; 
+      const newBalanceFromCurrency = (Number(balances[fromCurrency]) || 0) - amount;
 
       // "You receive" 금액 계산 (가격 변환)
-      const receiveAmount = (amount * (Number(prices[fromCurrency]) || 0)) / (Number(prices[toCurrency]) || 1); 
+      const receiveAmount = (amount * (Number(prices[fromCurrency]) || 0)) / (Number(prices[toCurrency]) || 1);
 
       // "You receive" 통화의 잔액 추가
       const newBalanceToCurrency = (Number(balances[toCurrency]) || 0) + receiveAmount;
 
-      // 데이터 서버로 전송
+      // 서버로 스왑 요청 (postSwap)
       const swapData = { fromCurrency, toCurrency, amount };
       await postSwap(swapData); // API 호출 (POST 요청)
 
-      // 상태 업데이트 (잔액 업데이트)
+      // 스왑 후 잔액 업데이트 (UI 상태 갱신)
       setBalances({
         ...balances,
         [fromCurrency]: newBalanceFromCurrency, // "You pay" 통화 잔액 차감
         [toCurrency]: newBalanceToCurrency, // "You receive" 통화 잔액 추가
       });
+
+      // 여기에 DB에서 발란스를 업데이트하는 부분을 추가할 수 있습니다.
+      // 주석 처리된 부분: 나중에 DB에 발란스 업데이트 코드 추가 필요
+      // 스왑과 밸랜스 업데이트 로직을 같이 사용할수있게 변경
+      
+      /*
+      const updatedBalances = await updateBalancesOnServer(newBalanceFromCurrency, newBalanceToCurrency);
+      setBalances(updatedBalances); 
+      */
 
       alert('Swap completed!'); // 성공 알림
     } catch (error) {
