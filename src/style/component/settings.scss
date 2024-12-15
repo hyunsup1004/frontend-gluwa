@@ -1,0 +1,255 @@
+@charset "UTF-8";
+
+.settings-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.button-setting {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  column-gap: 6px;
+  padding: 10px 14px;
+  text-align: center;
+  cursor: pointer;
+  @include textBody(textBody3);
+
+  &::after {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    @include background-image(null, 'ico-setting');
+    content: "";
+  }
+
+  &:has(.dialog) {
+    padding: 10px 14px;
+    background-color: #121416;
+    border-radius: 100px;
+    color: #666;
+    &:has(.caution) {
+      background-color: #FFC40019;
+      color: #FFC4007f;
+    }
+    // &:has(.clear) {
+    //   color: $neonGreen;
+    //   background: none;
+    // }
+  }
+}
+
+.settings-wrap:has(#settingsCheck[type="checkbox"]:checked) {
+  .settings-menu {
+    display: block;
+  }
+}
+
+.settings-menu {
+  display: none;
+  z-index: 90;
+  position: absolute;
+  top: 55px;
+  right: 4px;
+  width: 320px;
+  padding: 18px;
+  border: 1px solid $borderColor;
+  background-color: $baseColor;
+  &::before {
+    position: absolute;
+    top: -5px;
+    right: 12px;
+    width: 10px; 
+    height: 10px;
+    border: 1px solid $borderColor;
+    border-width: 1px 0 0 1px;
+    background-color: $baseColor;
+    transform: rotate(45deg);
+    content: "";
+  }
+
+  &.open {
+    display: block;
+  }
+}
+.settings-item {
+  @include textBody(textBody3);
+
+  button {
+    @include textBody(textBody3);
+  }
+
+  + .settings-item {
+    margin-top: 20px;
+    padding-top: 19px;
+    border-top: 1px solid #222;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    column-gap: 10px;
+    .rt {
+      margin-left: auto;
+    }
+  }
+
+  .title {
+    display: flex;
+    align-items: center;
+    .text {
+      color: #999;
+    }
+    .ico-question {
+      margin-left: 3px;
+    }
+  }
+
+  .check-toggle {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    &::after {
+      display: block;
+      margin: {
+        top: -4px;
+        left: 10px;
+      };
+      width: 8px;
+      height: 8px;
+      border: {
+        width: 2px 2px 0 0;
+        style: solid;
+        color: #999;
+      };
+      transform: rotate(135deg);
+      transition: transform 0.25s ease 0s;
+      content: "";
+    }
+  }
+
+  &:has(.check-toggle input[type="checkbox"]:checked) {
+    .check-toggle {
+      &::after {
+        margin-top: 2px;
+        transform: rotate(-45deg);
+      }
+    }
+    .detail {
+      padding-top: 20px;
+      height: max-content;
+    }
+  }
+
+  .detail {
+    height: 0px;
+    overflow: hidden;
+    width: 100%;
+    min-width: min-content;
+    will-change: height;
+
+    // &.expand {
+    //   padding-top: 20px;
+    //   height: max-content;
+    // }
+  }
+
+  .button-switch {
+    display: flex;
+    align-items: center;
+    column-gap: 5px;
+    padding: 4px 5px;
+    border: 1px solid #222;
+    border-radius: 10px;
+    
+    button {
+      flex: 1;
+      height: 38px;
+      padding: 10px 12px 9px;
+      &.active {
+        border-radius: 8px;
+        background-color: #1D2021;
+      }
+    }
+  }
+
+  .input-area {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    column-gap: 10px;
+    // padding: 15px 15px 14px;
+    padding: {
+      right: 15px;
+      left: 15px;
+    };
+    min-width: 112px;
+    height: 48px;
+    border: 1px solid #222;
+    border-radius: 10px;
+
+    input {
+      flex: 1;
+      padding: {
+        top: 15px;
+        bottom: 14px;
+      };
+      width: 56px;
+      height: 46px;
+      text-align: right;
+      @include textBody(textBody3);
+      &::placeholder {
+        color: #fff;
+        opacity: .2;
+      }
+    }
+
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    &:has(input:focus) {
+      border-color: $neonGreen;
+    }
+
+    &.warning {
+      border-color: $warnColor;
+      &:has(input:focus) {
+        border-color: $warnColor;
+      }
+      input {
+        color: $warnColor;
+      }
+    }
+
+    .text {
+      flex-shrink: 0;
+    }
+  }
+
+  .text-caution {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    column-gap: 6px;
+    color: $cautionColor;
+    @include textCaption();
+
+    &::before {
+      flex-shrink: 0;
+      display: block;
+      width: 21px;
+      height: 18px;
+      @include background-image(null, 'ico-caution');
+      content: "";
+    }
+  }
+}

@@ -1,0 +1,91 @@
+@charset "UTF-8";
+
+.token {
+  position: relative;
+  // overflow: hidden;
+  border-radius: 100%;
+
+  &::before {
+    display: block;
+    width: 100%;
+    height: 100%;
+    content: "";
+  }
+
+  &:not(.CTC) {
+    &::after {
+      position: absolute;
+      right: -2px;
+      bottom: 0;
+      width: 42.9%;
+      height: 42.9%;
+      @include background-image(token, 'token-CTC');
+      background-size: contain;
+      background-position: center;
+      content: "";
+    }
+  }
+
+  $tokens: GCRE, ETH, CTC, GATE, WCTC, USDC, USDT, Wrapped, Mint, Default, USDC-T, USDT-T;
+  @each $token in $tokens {
+    &.#{$token} {
+      &::before {
+        @include background-image(token, 'token-#{$token}');
+        background-size: contain;
+      }
+    }
+  }
+
+  @for $i from 8 through 50 {
+    &[data-token-size="#{$i}"] {
+      width: #{$i}px; height: #{$i}px;
+    }
+  }
+}
+
+.token-wrap {
+  position: relative;
+  .token {
+    flex-shrink: 0;
+  }
+
+  .half {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    &::before {
+      width: 13px;
+      background-size: cover;
+    }
+    &::after {
+      display: none;
+      left: 3px;
+    }
+    &:nth-child(2) {
+      position: absolute;
+      top: 0;
+      left: 15px;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      &::before {
+        width: 13px;
+        background-position: 100% 0;
+      }
+      &::after {
+        display: block;
+      }
+    }
+  }
+  &:has(.double) {
+    display: flex;
+  }
+  .double {
+    + .double {
+      margin-left: -5px;
+    }
+  }
+  .sm {
+    position: absolute;
+    right: -2px;
+    bottom: 0;
+  }
+}

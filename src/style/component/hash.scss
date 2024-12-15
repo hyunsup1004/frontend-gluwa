@@ -1,0 +1,40 @@
+@charset "UTF-8";
+
+.hash {
+  position: relative;
+  .t {
+    display: block !important;
+  }
+
+  &[data-color="dark"] {
+    .t {
+      color: #0A0C0E !important;
+    }
+  }
+  &[data-color="white"] {
+    .t {
+      color: #ffffff !important;
+    }
+  }
+  &[data-color="neonGreen"] {
+    .t {
+      color: $neonGreen !important;
+    }
+  }
+
+  &[data-underline="true"] {
+    .t {
+      text-decoration: underline;
+      text-underline-position: under;
+    }
+  }
+}
+
+.hash-dummy {
+  position: fixed;
+  top: -100px;
+  left: -100px;
+  white-space: nowrap;
+  visibility: hidden;
+  z-index: 1000;
+}

@@ -1,0 +1,66 @@
+@charset "UTF-8";
+
+.page {
+  margin: {
+    right: auto;
+    left: auto;
+  };
+  padding-top: 60px;
+  
+  .box-content {
+    margin: {
+      right: auto;
+      left: auto;
+    };
+    border: 1px solid $borderColor;
+  }
+
+  .heading {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 20px 30px;
+    min-height: 75px;
+    h2 {
+      flex: 1;
+      @include textSubTitle(textSubTitle3);
+    }
+    &:has(.settings-wrap) {
+      padding: {
+        right: 16px;
+        bottom: 15px;
+      };
+    }
+    &:has(.button-back) {
+      padding: {
+        left: 53px;
+      };
+    }
+    .button-back {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 53px;
+      height: 100%;
+      &::before {
+        position: absolute;
+        top: calc(50% - 4px);
+        left: calc(50% - 4px);
+        width: 13px;
+        height: 13px;
+        border: {
+          width: 1px 0 0 1px;
+          style: solid;
+          color: #fff;
+        };
+        transform: rotate(-45deg);
+        content: "";
+      }
+    }
+    .button-clear {
+      margin-right: 6px;
+      color: $neonGreen;
+      @include textBody(textBody3);
+    }
+  }
+}

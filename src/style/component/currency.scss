@@ -1,0 +1,122 @@
+@charset "UTF-8";
+
+.currency-label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 9px;
+  border: 1px solid #222;
+  border-radius: 100px;
+  background-color: $baseColor;
+  min-width: 120px;
+  font-size: 16px;
+
+  &[type="button"] {
+    padding-right: 16px;
+    min-width: 143px;
+
+    .name {
+      margin-right: 10px;
+    }
+
+    &::after {
+      margin-top: -4px;
+      margin-left: auto;
+      display: block;
+      width: 8px;
+      height: 8px;
+      border: {
+        width: 2px 0 0 2px;
+        style: solid;
+        color: #fff;
+      };
+      transform: rotate(-135deg);
+      content: "";
+    }
+  }
+
+  &.select {
+    column-gap: 10px;
+    padding: 14px 16px 13px;
+    border: none;
+    background-color: $neonGreen;
+    color: $baseColor;
+    font-family: 'SF-Pro-B';
+    letter-spacing: -0.01em;
+    @include font-size(18px);
+    &::after {
+      border-color: $baseColor;
+    }
+  }
+
+  .token {
+    flex-shrink: 0;
+  }
+
+  .name {
+    margin-left: 8px;
+    font-family: 'SF-Pro-B';
+    @include font-size(18px);
+  }
+}
+              
+.currencies {
+  display: flex;
+  gap: 6px;
+  padding-bottom: 20px;
+
+  .currency-label {
+    padding: 7px 11px 7px 7px;
+    border: 1px solid #383838;
+    border-radius: 100px;
+
+    &:hover {
+      border-color: #565656;
+      background-color: #292929;
+    }
+    
+    .full {
+      + span {
+        color: #999;
+        @include textCaption();
+      }
+    }
+  }
+}
+
+.currency-list-wrap {
+  margin: -10px 0;
+  .currency-label {
+    width: calc(100% + 40px);
+    margin: 0 -20px;
+    padding: 10px 20px;
+    text-align: left;
+    min-width: unset;
+    border: none;
+    border-radius: unset;
+    background: none;
+    &::after {
+      display: none;
+    }
+    
+    &:hover {
+      background-color: #292929;
+    }
+
+    &:disabled {
+      pointer-events: none;
+      background-color: none;
+      opacity: .2;
+    }
+  }
+  .name {
+    margin-left: 10px;
+    .full {
+      + span {
+        display: block;
+        color: #999;
+        @include textCaption();
+      }
+    }
+  }
+}
